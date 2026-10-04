@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ישראל נגד אירלנד • חי</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family:'Heebo', system-ui, sans-serif;
+    background: radial-gradient(1200px 600px at 50% -10%, #1b2a52 0%, #0a0e1a 55%, #060810 100%);
+    color:#f2f4fa; min-height:100vh; padding:20px 14px 60px;
+  }
+  .wrap { max-width:640px; margin:0 auto; }
+  .comp {
+    text-align:center; color:#9fb2d8; font-size:14px; font-weight:600;
+    letter-spacing:.5px; margin-bottom:14px;
+  }
+  .card {
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.09);
+    border-radius:22px; backdrop-filter:blur(12px);
+    padding:26px 20px; box-shadow:0 20px 60px rgba(0,0,0,.45);
+  }
+  .teams { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .team { flex:1; text-align:center; }
+  .team img { width:64px; height:64px; object-fit:contain; margin-bottom:8px; filter:drop-shadow(0 4px 10px rgba(0,0,0,.5)); }
+  .team .nm { font-size:20px; font-weight:900; }
+  .scorebox { text-align:center; min-width:150px; }
+  .score { font-size:64px; font-weight:900; line-height:1; letter-spacing:2px; }
+  .score .dash { color:#5b6b8f; font-weight:400; }
+  .minute {
+    display:inline-flex; align-items:center; gap:8px; margin-top:10px;
+    background:rgba(255,60,60,.14); border:1px solid rgba(255,60,60,.4);
+    color:#ff7b7b; font-weight:700; font-size:15px;
+    padding:5px 16px; border-radius:999px;
+  }
+  .dot { width:9px; height:9px; border-radius:50%; background:#ff3c3c; animation:pulse 1.2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1; transform:scale(1);} 50%{opacity:.4; transform:scale(.75);} }
+  .badge {
+    display:inline-block; margin-top:10px; font-size:13px; font-weight:600;
+    color:#9fb2d8; background:rgba(255,255,255,.06);
+    padding:5px 16px; border-radius:999px; border:1px solid rgba(255,255,255,.1);
+  }
+  /* countdown */
+  .cd-title { text-align:center; font-size:18px; font-weight:700; color:#cdd8f2; margin-bottom:14px; }
+  .cd { display:flex; justify-content:center; gap:12px; direction:ltr; }
+  .cd .cell {
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1);
+    border-radius:16px; min-width:78px; padding:14px 6px; text-align:center;
+  }
+  .cd .num { font-size:38px; font-weight:900; font-variant-numeric:tabular-nums; }
+  .cd .lbl { font-size:12px; color:#9fb2d8; margin-top:4px; }
+  .kickoff { text-align:center; color:#9fb2d8; font-size:14px; margin-top:14px; }
+  /* events */
+  .sec-title { font-size:18px; font-weight:900; margin:26px 4px 12px; display:flex; align-items:center; gap:8px; }
+  .sec-title::after { content:""; flex:1; height:1px; background:rgba(255,255,255,.1); }
+  .ev {
+    display:flex; gap:12px; align-items:flex-start;
+    background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07);
+    border-radius:14px; padding:12px 14px; margin-bottom:10px;
+  }
+  .ev.goal { border-color:rgba(245,197,24,.45); background:rgba(245,197,24,.07); }
+  .ev .ico { font-size:22px; line-height:1.3; }
+  .ev .min {
+    background:#2a3552; color:#fff; font-weight:700; font-size:13px;
+    border-radius:8px; padding:3px 9px; white-space:nowrap; font-variant-numeric:tabular-nums;
+  }
+  .ev .txt { font-size:15px; line-height:1.5; }
+  .ev .txt b { font-weight:700; }
+  .ev .sub { color:#9fb2d8; font-size:13px; }
+  .empty { text-align:center; color:#8b98b8; padding:26px 10px; font-size:15px; }
+  /* lineups */
+  .forms { display:flex; gap:10px; margin-bottom:14px; }
+  .form { flex:1; text-align:center; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:8px; font-size:13px; color:#9fb2d8; }
+  .form b { color:#fff; font-size:16px; display:block; }
+  .lu { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .lucol h4 { font-size:14px; font-weight:700; margin-bottom:8px; color:#cdd8f2; }
+  .pl {
+    display:flex; align-items:center; gap:8px; font-size:14px;
+    background:rgba(255,255,255,.03); border-radius:10px; padding:7px 10px; margin-bottom:6px;
+  }
+  .pl .num {
+    width:26px; height:26px; border-radius:50%; background:#2a3552; flex:none;
+    display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;
+  }
+  .lucol h5 { font-size:12px; color:#8b98b8; margin:10px 0 6px; font-weight:600; }
+  footer { text-align:center; color:#6b7694; font-size:12px; margin-top:34px; line-height:1.8; }
+  .upd { color:#8fe3a0; }
+  .err { background:rgba(255,60,60,.1); border:1px solid rgba(255,60,60,.35); color:#ffb3b3; border-radius:14px; padding:14px; text-align:center; margin-bottom:14px; font-size:14px; }
+  @media (max-width:480px){ .score{font-size:52px;} .cd .cell{min-width:66px;} .cd .num{font-size:30px;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="comp" id="comp">ליגת האומות</div>
+  <div id="err"></div>
+  <div class="card">
+    <div class="teams">
+      <div class="team">
+        <img id="homeLogo" alt=""><div class="nm" id="homeName">אירלנד</div>
+      </div>
+      <div class="scorebox">
+        <div class="score" id="score"><span class="dash">–</span></div>
+        <div id="statusLine"></div>
+      </div>
+      <div class="team">
+        <img id="awayLogo" alt=""><div class="nm" id="awayName">ישראל</div>
+      </div>
+    </div>
+    <div id="countdown" style="display:none; margin-top:18px;">
+      <div class="cd-title">המשחק מתחיל בעוד</div>
+      <div class="cd">
+        <div class="cell"><div class="num" id="cdS">00</div><div class="lbl">שניות</div></div>
+        <div class="cell"><div class="num" id="cdM">00</div><div class="lbl">דקות</div></div>
+        <div class="cell"><div class="num" id="cdH">00</div><div class="lbl">שעות</div></div>
+      </div>
+      <div class="kickoff" id="kickoffLine"></div>
+    </div>
+  </div>
+
+  <div id="eventsSec" style="display:none;">
+    <div class="sec-title">⚽ אירועים</div>
+    <div id="events"></div>
+  </div>
+
+  <div id="lineupSec" style="display:none;">
+    <div class="sec-title">📋 הרכבים</div>
+    <div class="forms">
+      <div class="form"><b id="homeForm"></b><span id="homeFormName"></span></div>
+      <div class="form"><b id="awayForm"></b><span id="awayFormName"></span></div>
+    </div>
+    <div class="lu">
+      <div class="lucol"><h4 id="homeXiTitle"></h4><div id="homeXi"></div><h5>מחליפים</h5><div id="homeSubs"></div></div>
+      <div class="lucol"><h4 id="awayXiTitle"></h4><div id="awayXi"></div><h5>מחליפים</h5><div id="awaySubs"></div></div>
+    </div>
+  </div>
+
+  <footer>
+    <span class="upd">●</span> מתעדכן אוטומטית כל 30 שניות • <span id="updTime"></span><br>
+    מקור הנתונים: SportScore
+  </footer>
+</div>
+
+<script>
+const API = 'https://sportscore.com/api/widget/match/?sport=football&slug=israel-vs-ireland';
+const WANT_DATE = '2026-10-04'; // guard: ignore stale fixtures between the same teams
+const TEAMS_HE = { 'Ireland':'אירלנד', 'Israel':'ישראל' };
+
+// Hebrew player names (Latin fallback when unknown — never guessed)
+const HE = {
+  // --- Israel ---
+  'daniel peretz':'דניאל פרץ','omri glazer':'עומרי גלזר','yoav gerafi':'יואב גראפי',
+  'eli dasa':'אלי דסה','raz shlomo':'רז שלמה','ofri arad':'עופרי ארד','stav lemkin':'סתיו למקין',
+  'roy revivo':'רוי רביבו','idan nachmias':'עידן נחמיאס','or israelov':'אור ישראלוב',
+  'neta lavi':'נטע לביא','dor peretz':'דור פרץ','mohammad abu fani':'מוחמד אבו פאני',
+  'oscar gloukh':'אוסקר גלוך','manor solomon':'מנור סולומון','liel abada':'ליאל עבדה',
+  'tai baribo':'תאי בריבו','anan khalaili':'ענאן חלאילי','dean david':'דין דוד',
+  'yonas malede':'יונס מלדה','sagiv yehezkel':'שגיב יחזקאל','gavriel kanichowsky':'גבריאל קניקובסקי',
+  'ramzi safuri':'רמזי ספורי','dennis adeniran':'דניס אדנירן',
+  // --- Ireland ---
+  'caoimhin kelleher':'קאווהין קלהר','gavin bazunu':'גאבין באזונו','mark travers':'מארק טראברס',
+  'matt doherty':'מאט דוהרטי','nathan collins':'ניית׳ן קולינס','dara oshea':"דארה אושיי",
+  'liam scales':'ליאם סקיילס','robbie brady':'רובי בריידי','seamus coleman':'שיימוס קולמן',
+  'josh cullen':"ג'וש קאלן",'jason knight':"ג'ייסון נייט",'finn azaz':'פין עזאז',
+  'jayson molumby':"ג'ייסון מולומבי",'will smallbone':'וויל סמולבון','andy moran':'אנדי מורן',
+  'evan ferguson':'אוון פרגוסון','troy parrott':'טרוי פארוט','adam idah':'אדם אידה',
+  'chiedozie ogbene':"צ'ידוזי אוגבנה",'sammie szmodics':'סמי סמודיקס','mikey johnston':'מייקי ג׳ונסטון',
+  'jake obrien':"ג'ייק אובריאן",'jimmy dunne':"ג'ימי דאן",
+  // --- Beitar / known Israelis (may appear) ---
+  'yarden shua':'ירדן שועה','omer atzili':'עומר אצילי','shon weissman':'שון וייסמן',
+  'tomer yosefi':'תומר יוספי','dor hugy':'דור חוגי','timothy muzie':'טימותי מוזי'
+};
+const norm = s => (s||'').trim().toLowerCase().replace(/\s+/g,' ');
+const heName = n => HE[norm(n)] || (n||'').trim();
+
+const EV_HE = [
+  [/penalty.*goal|goal.*penalty/i, '⚽', 'גול מפנדל'],
+  [/own goal/i, '⚽', 'גול עצמי'],
+  [/goal/i, '⚽', 'גול'],
+  [/second yellow/i, '🟨🟥', 'כרטיס צהוב שני'],
+  [/yellow/i, '🟨', 'כרטיס צהוב'],
+  [/red/i, '🟥', 'כרטיס אדום'],
+  [/substitution/i, '🔄', 'חילוף'],
+  [/missed penalty|penalty miss/i, '❌', 'פנדל מוחמץ'],
+  [/half time/i, '⏸️', 'מחצית'],
+  [/full time/i, '🏁', 'שריקת סיום'],
+  [/var/i, '📺', 'בדיקת VAR']
+];
+function evMeta(type){
+  for (const [re, ico, lbl] of EV_HE) if (re.test(type||'')) return {ico, lbl};
+  return {ico:'📌', lbl:type||'אירוע'};
+}
+const sideHe = s => s==='home' ? TEAMS_HE['Ireland'] : s==='away' ? TEAMS_HE['Israel'] : '';
+
+let kickoffTs = null, cdTimer = null;
+
+function fmtTime(ts){
+  const d = new Date(ts);
+  return d.toLocaleString('he-IL',{weekday:'long', day:'numeric', month:'numeric', hour:'2-digit', minute:'2-digit'});
+}
+function startCountdown(){
+  stopCountdown();
+  const pad = n => String(n).padStart(2,'0');
+  const upd = () => {
+    let diff = Math.max(0, kickoffTs - Date.now());
+    const h = Math.floor(diff/3.6e6), m = Math.floor(diff%3.6e6/6e4), s = Math.floor(diff%6e4/1e3);
+    cdH.textContent = pad(h); cdM.textContent = pad(m); cdS.textContent = pad(s);
+    if (diff <= 0) tick(); // kickoff reached -> refresh now
+  };
+  cdTimer = setInterval(upd, 1000); upd();
+}
+function stopCountdown(){ if (cdTimer){ clearInterval(cdTimer); cdTimer = null; } }
+
+function render(m){
+  err.innerHTML = '';
+  // date guard
+  if (WANT_DATE && !(m.time||'').startsWith(WANT_DATE)){
+    err.innerHTML = 'המשחק המבוקש (2026-10-04) טרם נטען — מוצג משחק אחר בין הקבוצות.';
+    return;
+  }
+  comp.textContent = m.competition || 'ליגת האומות';
+  homeName.textContent = TEAMS_HE[m.home] || m.home || 'אירלנד';
+  awayName.textContent = TEAMS_HE[m.away] || m.away || 'ישראל';
+  if (m.home_logo) homeLogo.src = m.home_logo;
+  if (m.away_logo) awayLogo.src = m.away_logo;
+
+  const st = (m.status||'').toLowerCase();
+  const finished = ['finished','ft','full time','after','ended'].includes(st);
+  const upcoming = ['upcoming','not started','notstarted','scheduled'].includes(st);
+
+  if (upcoming){
+    score.innerHTML = '<span class="dash">–</span>';
+    statusLine.innerHTML = '<span class="badge">טרם החל</span>';
+    kickoffTs = new Date(m.time).getTime();
+    kickoffLine.textContent = 'בעיטה: ' + fmtTime(kickoffTs);
+    countdown.style.display = 'block';
+    startCountdown();
+    eventsSec.style.display = 'none';
+    lineupSec.style.display = 'none';
+  } else {
+    stopCountdown();
+    countdown.style.display = 'none';
+    const hs = m.home_score ?? '–', as = m.away_score ?? '–';
+    score.textContent = hs + ' - ' + as;
+    if (finished){
+      statusLine.innerHTML = '<span class="badge">סיום המשחק</span>';
+    } else {
+      const min = m.live_minute ?? '';
+      statusLine.innerHTML = '<span class="minute"><span class="dot"></span>חי' + (min!=='' ? ' • ' + min + '׳' : '') + '</span>';
+    }
+    renderEvents(m.incidents||[]);
+    renderLineups(m.lineups||{}, m.home, m.away);
+  }
+  updTime.textContent = 'עודכן: ' + new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+
+function renderEvents(incs){
+  const list = [...incs].sort((a,b)=>(b.time??0)-(a.time??0));
+  if (!list.length){ eventsSec.style.display='none'; return; }
+  eventsSec.style.display = 'block';
+  events.innerHTML = list.map(i=>{
+    const {ico, lbl} = evMeta(i.type);
+    const isG = /goal/i.test(i.type||'');
+    let desc = '';
+    if (/substitution/i.test(i.type||'')){
+      desc = '<b>' + heName(i.player_out) + '</b> ← <b>' + heName(i.player_in) + '</b>';
+    } else {
+      desc = i.player ? '<b>' + heName(i.player) + '</b>' : '';
+      if (isG && i.home_score!=null) desc += ' <span class="sub">(' + i.home_score + '-' + i.away_score + ')</span>';
+    }
+    const team = sideHe(i.side);
+    return '<div class="ev' + (isG?' goal':'') + '"><div class="ico">' + ico + '</div>' +
+      '<div class="min">' + (i.time??'') + '׳</div>' +
+      '<div class="txt">' + lbl + (desc ? ' — ' + desc : '') +
+      (team ? '<div class="sub">' + team + '</div>' : '') + '</div></div>';
+  }).join('');
+}
+
+function renderLineups(lu, home, away){
+  const has = (lu.home_xi&&lu.home_xi.length) || (lu.away_xi&&lu.away_xi.length);
+  if (!has){ lineupSec.style.display='none'; return; }
+  lineupSec.style.display = 'block';
+  homeForm.textContent = lu.home_formation || '';
+  awayForm.textContent = lu.away_formation || '';
+  homeFormName.textContent = TEAMS_HE[home] || home || '';
+  awayFormName.textContent = TEAMS_HE[away] || away || '';
+  homeXiTitle.textContent = 'הרכב ' + (TEAMS_HE[home]||'');
+  awayXiTitle.textContent = 'הרכב ' + (TEAMS_HE[away]||'');
+  const pl = p => '<div class="pl"><span class="num">' + (p.number??'') + '</span><span>' + heName(p.name) + '</span></div>';
+  homeXi.innerHTML = (lu.home_xi||[]).map(pl).join('');
+  awayXi.innerHTML = (lu.away_xi||[]).map(pl).join('');
+  homeSubs.innerHTML = (lu.home_subs||[]).map(pl).join('');
+  awaySubs.innerHTML = (lu.away_subs||[]).map(pl).join('');
+}
+
+async function tick(){
+  try {
+    const r = await fetch(API, {cache:'no-store'});
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const m = (await r.json()).match;
+    if (!m) throw new Error('no match');
+    render(m);
+  } catch(e){
+    err.innerHTML = 'שגיאת חיבור לנתונים — מנסה שוב אוטומטית…';
+  }
+}
+tick();
+setInterval(tick, 30000);
+</script>
+</body>
+</html>
