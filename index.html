@@ -254,7 +254,7 @@ function renderPregame(){
   hs.textContent = '–'; as.textContent = '–';
   statusLine.innerHTML = '<span class="badge">טרם החל</span>';
   kickoffTs = KICKOFF;
-  kickoffLine.textContent = 'בעיטה: ' + fmtTime(KICKOFF);
+  kickoffLine.textContent = 'שריקת פתיחה: ' + fmtTime(KICKOFF);
   countdown.style.display = 'block';
   startCountdown();
   eventsSec.style.display = 'none';
@@ -282,7 +282,7 @@ function render(m){
     hs.textContent = '–'; as.textContent = '–';
     statusLine.innerHTML = '<span class="badge">טרם החל</span>';
     kickoffTs = new Date(m.time).getTime();
-    kickoffLine.textContent = 'בעיטה: ' + fmtTime(kickoffTs);
+    kickoffLine.textContent = 'שריקת פתיחה: ' + fmtTime(kickoffTs);
     countdown.style.display = 'block';
     startCountdown();
     eventsSec.style.display = 'none';
