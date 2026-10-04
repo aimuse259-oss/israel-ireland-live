@@ -95,7 +95,7 @@
 </head>
 <body>
 <div class="wrap">
-  <div class="comp" id="comp">ליגת האומות</div>
+  <div class="comp" id="comp">ליגת האומות • מחזור 4</div>
   <div id="err"></div>
   <div class="card">
     <div class="teams">
@@ -248,7 +248,7 @@ function armPolling(){
 // Static pre-match render: no network at all, countdown ticks locally.
 function renderPregame(){
   err.innerHTML = '';
-  comp.textContent = 'ליגת האומות';
+  comp.textContent = 'ליגת האומות • מחזור 4';
   homeName.textContent = 'אירלנד';
   awayName.textContent = 'ישראל';
   hs.textContent = '–'; as.textContent = '–';
@@ -268,7 +268,7 @@ function render(m){
     err.innerHTML = 'המשחק המבוקש (2026-10-04) טרם נטען — מוצג משחק אחר בין הקבוצות.';
     return;
   }
-  comp.textContent = heComp(m.competition) || 'ליגת האומות';
+  comp.textContent = (heComp(m.competition) || 'ליגת האומות') + ' • מחזור 4';
   homeName.textContent = TEAMS_HE[m.home] || m.home || 'אירלנד';
   awayName.textContent = TEAMS_HE[m.away] || m.away || 'ישראל';
   if (m.home_logo) homeLogo.src = m.home_logo;
