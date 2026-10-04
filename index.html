@@ -100,14 +100,14 @@
   <div class="card">
     <div class="teams">
       <div class="team">
-        <img id="homeLogo" alt=""><div class="nm" id="homeName">אירלנד</div>
+        <img id="homeLogo" src="https://img.thesports.com/football/team/c9949ae5d534fe930eae666413d32239.png" alt="אירלנד"><div class="nm" id="homeName">אירלנד</div>
       </div>
       <div class="scorebox">
         <div class="score" id="score"><span id="hs">–</span><span class="dash"> - </span><span id="as">–</span></div>
         <div id="statusLine"></div>
       </div>
       <div class="team">
-        <img id="awayLogo" alt=""><div class="nm" id="awayName">ישראל</div>
+        <img id="awayLogo" src="https://img.thesports.com/football/team/b0dc1effcd883299ca8ec96dd720d30c.png" alt="ישראל"><div class="nm" id="awayName">ישראל</div>
       </div>
     </div>
     <div id="countdown" style="display:none; margin-top:18px;">
@@ -139,7 +139,7 @@
   </div>
 
   <footer>
-    <span class="upd">●</span> מתעדכן אוטומטית כל 30 שניות • <span id="updTime"></span><br>
+    <span class="upd">●</span> הנתונים מתעדכנים כל 30 שניות<br>
     מקור הנתונים: SportScore
   </footer>
 </div>
@@ -227,18 +227,6 @@ function startCountdown(){
 }
 function stopCountdown(){ if (cdTimer){ clearInterval(cdTimer); cdTimer = null; } }
 
-function setFooter(mode){
-  const f = document.querySelector('footer');
-  if (mode==='pre'){
-    const t = new Date(POLL_START).toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
-    f.innerHTML = 'הספירה לאחור פועלת • בדיקת נתונים תחל ב-' + t;
-  } else if (mode==='live'){
-    f.innerHTML = '<span class="upd">●</span> מתעדכן אוטומטית כל 30 שניות • <span id="updTime"></span><br>מקור הנתונים: SportScore';
-  } else if (mode==='done'){
-    f.innerHTML = 'המשחק הסתיים • בדיקות הנתונים הופסקו<br>מקור הנתונים: SportScore';
-  }
-}
-
 function startPolling(){
   if (pollTimer) return;
   tick();
@@ -271,7 +259,6 @@ function renderPregame(){
   startCountdown();
   eventsSec.style.display = 'none';
   lineupSec.style.display = 'none';
-  setFooter('pre');
 }
 
 function render(m){
@@ -300,7 +287,6 @@ function render(m){
     startCountdown();
     eventsSec.style.display = 'none';
     lineupSec.style.display = 'none';
-    setFooter('live');
   } else {
     stopCountdown();
     countdown.style.display = 'none';
@@ -310,16 +296,13 @@ function render(m){
     if (finished){
       statusLine.innerHTML = '<span class="badge">סיום המשחק</span>';
       stopPolling();
-      setFooter('done');
     } else {
       const min = m.live_minute ?? '';
       statusLine.innerHTML = '<span class="minute"><span class="dot"></span>חי' + (min!=='' ? ' • ' + min + '׳' : '') + '</span>';
-      setFooter('live');
-    }
+      }
     renderEvents(m.incidents||[]);
     renderLineups(m.lineups||{}, m.home, m.away);
   }
-  updTime.textContent = 'עודכן: ' + new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
 }
 
 function renderEvents(incs){
