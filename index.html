@@ -146,7 +146,7 @@
   </div>
 
   <footer>
-    <span class="upd">●</span> הנתונים מתעדכנים כל 15 שניות<br>
+    <span class="upd">●</span> <span id="updTxt">הנתונים מתעדכנים כל 15 שניות</span><br>
     מקור הנתונים: SportScore
   </footer>
 </div>
@@ -154,11 +154,15 @@
 <script>
 const API = 'https://sportscore.com/api/widget/match/?sport=football&slug=israel-vs-ireland';
 const WANT_DATE = '2026-10-04'; // guard: ignore stale fixtures between the same teams
-// Polling window: only from 90 seconds before kickoff until the match actually ends.
-// Before that the page shows a local countdown with zero network requests.
+// Polling: pre-match lineups watch (every 60s) from 90 min before kickoff;
+// full live polling (every 15s) from 90 seconds before kickoff until the match actually ends.
+// Before the lineups watch the page shows a local countdown with zero network requests.
+// Everything runs in the visitor's browser — no server-side polling.
 const KICKOFF = new Date('2026-10-04T18:45:00Z').getTime();
 const POLL_START = KICKOFF - 90*1000;
-let pollTimer = null, pollStartTimer = null;
+const PRE_POLL_START = KICKOFF - 90*60*1000;
+const PRE_POLL_MS = 60000, POLL_MS = 15000;
+let pollTimer = null, pollStartTimer = null, pollMode = null;
 const TEAMS_HE = { 'Ireland':'אירלנד', 'Israel':'ישראל' };
 const COMP_HE = {
   'uefa nations league':'ליגת האומות',
@@ -234,21 +238,35 @@ function startCountdown(){
 }
 function stopCountdown(){ if (cdTimer){ clearInterval(cdTimer); cdTimer = null; } }
 
-function startPolling(){
-  if (pollTimer) return;
+function startPrePolling(){
+  if (pollMode === 'pre') return;
+  stopPolling();
+  pollMode = 'pre';
   tick();
-  pollTimer = setInterval(tick, 15000);
+  pollTimer = setInterval(tick, PRE_POLL_MS);
+}
+function startPolling(){
+  if (pollMode === 'live') return;
+  stopPolling();
+  pollMode = 'live';
+  tick();
+  pollTimer = setInterval(tick, POLL_MS);
 }
 function stopPolling(){
   if (pollTimer){ clearInterval(pollTimer); pollTimer = null; }
   if (pollStartTimer){ clearTimeout(pollStartTimer); pollStartTimer = null; }
+  pollMode = null;
 }
 function armPolling(){
   stopPolling();
-  if (Date.now() >= POLL_START){
+  const now = Date.now();
+  if (now >= POLL_START){
     startPolling();
+  } else if (now >= PRE_POLL_START){
+    startPrePolling();
+    pollStartTimer = setTimeout(startPolling, POLL_START - now);
   } else {
-    pollStartTimer = setTimeout(startPolling, POLL_START - Date.now());
+    pollStartTimer = setTimeout(armPolling, PRE_POLL_START - now);
   }
 }
 
@@ -304,9 +322,11 @@ function render(m){
       startCountdown();
     }
     eventsSec.style.display = 'none';
-    lineupSec.style.display = 'none';
+    renderLineups(m.lineups||{}, m.home, m.away);
+    updTxt.textContent = 'הנתונים מתעדכנים כל דקה';
   } else {
     stopCountdown();
+    updTxt.textContent = 'הנתונים מתעדכנים כל 15 שניות';
     countdown.style.display = 'none';
     const hsc = m.home_score, asc = m.away_score;
     hs.textContent = (hsc==null ? '–' : hsc);
