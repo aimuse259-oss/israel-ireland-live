@@ -146,7 +146,7 @@
   </div>
 
   <footer>
-    <span class="upd">●</span> הנתונים מתעדכנים כל 15 שניות<br>
+    <span class="upd">●</span> הנתונים מתעדכנים כל 5 שניות<br>
     מקור הנתונים: SportScore
   </footer>
 </div>
@@ -155,13 +155,13 @@
 const API = 'https://sportscore.com/api/widget/match/?sport=football&slug=israel-vs-ireland';
 const WANT_DATE = '2026-10-04'; // guard: ignore stale fixtures between the same teams
 // Polling: pre-match lineups watch (every 60s) from 90 min before kickoff;
-// full live polling (every 15s) from 90 seconds before kickoff until the match actually ends.
+// full live polling (every 5s) from 90 seconds before kickoff until the match actually ends.
 // Before the lineups watch the page shows a local countdown with zero network requests.
 // Everything runs in the visitor's browser — no server-side polling.
 const KICKOFF = new Date('2026-10-04T18:45:00Z').getTime();
 const POLL_START = KICKOFF - 90*1000;
 const PRE_POLL_START = KICKOFF - 90*60*1000;
-const PRE_POLL_MS = 60000, POLL_MS = 15000;
+const PRE_POLL_MS = 60000, POLL_MS = 5000;
 let pollTimer = null, pollStartTimer = null, pollMode = null;
 const TEAMS_HE = { 'Ireland':'אירלנד', 'Israel':'ישראל' };
 const COMP_HE = {
@@ -211,11 +211,22 @@ const EV_HE = [
   [/missed penalty|penalty miss/i, '❌', 'פנדל מוחמץ'],
   [/half time/i, '⏸️', 'מחצית'],
   [/full time/i, '🏁', 'שריקת סיום'],
-  [/var/i, '📺', 'בדיקת VAR']
+  [/var/i, '📺', 'בדיקת VAR'],
+  [/penalty shootout|shootout/i, '⚽', 'דו-קרב פנדלים'],
+  [/extra time/i, '⏱️', 'הארכה']
 ];
 function evMeta(type){
   for (const [re, ico, lbl] of EV_HE) if (re.test(type||'')) return {ico, lbl};
   return {ico:'📌', lbl:type||'אירוע'};
+}
+// Special minute tokens from the API, shown in Hebrew (numeric minutes get a geresh)
+function fmtMinute(min){
+  if (min == null || min === '') return '';
+  const t = String(min).trim().toUpperCase();
+  if (t === 'HT') return 'מחצית';
+  if (t === 'FT') return 'סיום';
+  if (t === 'ET') return 'הארכה';
+  return min + '׳';
 }
 const sideHe = s => s==='home' ? TEAMS_HE['Ireland'] : s==='away' ? TEAMS_HE['Israel'] : '';
 
@@ -333,8 +344,8 @@ function render(m){
       statusLine.innerHTML = '<span class="badge">סיום המשחק</span>';
       stopPolling();
     } else {
-      const min = m.live_minute ?? '';
-      statusLine.innerHTML = '<span class="minute"><span class="dot"></span>חי' + (min!=='' ? ' • ' + min + '׳' : '') + '</span>';
+      const minTxt = fmtMinute(m.live_minute);
+      statusLine.innerHTML = '<span class="minute"><span class="dot"></span>חי' + (minTxt ? ' • ' + minTxt : '') + '</span>';
       }
     renderEvents(m.incidents||[]);
     renderLineups(m.lineups||{}, m.home, m.away);
