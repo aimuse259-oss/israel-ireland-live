@@ -146,7 +146,7 @@
   </div>
 
   <footer>
-    <span class="upd">●</span> <span id="updTxt">הנתונים מתעדכנים כל 15 שניות</span><br>
+    <span class="upd">●</span> הנתונים מתעדכנים כל 15 שניות<br>
     מקור הנתונים: SportScore
   </footer>
 </div>
@@ -323,10 +323,8 @@ function render(m){
     }
     eventsSec.style.display = 'none';
     renderLineups(m.lineups||{}, m.home, m.away);
-    updTxt.textContent = 'הנתונים מתעדכנים כל דקה';
   } else {
     stopCountdown();
-    updTxt.textContent = 'הנתונים מתעדכנים כל 15 שניות';
     countdown.style.display = 'none';
     const hsc = m.home_score, asc = m.away_score;
     hs.textContent = (hsc==null ? '–' : hsc);
