@@ -147,6 +147,11 @@
 <script>
 const API = 'https://sportscore.com/api/widget/match/?sport=football&slug=israel-vs-ireland';
 const WANT_DATE = '2026-10-04'; // guard: ignore stale fixtures between the same teams
+// Polling window: only from 90 seconds before kickoff until the match actually ends.
+// Before that the page shows a local countdown with zero network requests.
+const KICKOFF = new Date('2026-10-04T18:45:00Z').getTime();
+const POLL_START = KICKOFF - 90*1000;
+let pollTimer = null, pollStartTimer = null;
 const TEAMS_HE = { 'Ireland':'אירלנד', 'Israel':'ישראל' };
 const COMP_HE = {
   'uefa nations league':'ליגת האומות',
@@ -216,11 +221,58 @@ function startCountdown(){
     let diff = Math.max(0, kickoffTs - Date.now());
     const h = Math.floor(diff/3.6e6), m = Math.floor(diff%3.6e6/6e4), s = Math.floor(diff%6e4/1e3);
     cdH.textContent = pad(h); cdM.textContent = pad(m); cdS.textContent = pad(s);
-    if (diff <= 0) tick(); // kickoff reached -> refresh now
+    if (diff <= 0) startPolling(); // kickoff reached -> make sure polling runs
   };
   cdTimer = setInterval(upd, 1000); upd();
 }
 function stopCountdown(){ if (cdTimer){ clearInterval(cdTimer); cdTimer = null; } }
+
+function setFooter(mode){
+  const f = document.querySelector('footer');
+  if (mode==='pre'){
+    const t = new Date(POLL_START).toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
+    f.innerHTML = 'הספירה לאחור פועלת • בדיקת נתונים תחל ב-' + t;
+  } else if (mode==='live'){
+    f.innerHTML = '<span class="upd">●</span> מתעדכן אוטומטית כל 30 שניות • <span id="updTime"></span><br>מקור הנתונים: SportScore';
+  } else if (mode==='done'){
+    f.innerHTML = 'המשחק הסתיים • בדיקות הנתונים הופסקו<br>מקור הנתונים: SportScore';
+  }
+}
+
+function startPolling(){
+  if (pollTimer) return;
+  tick();
+  pollTimer = setInterval(tick, 30000);
+}
+function stopPolling(){
+  if (pollTimer){ clearInterval(pollTimer); pollTimer = null; }
+  if (pollStartTimer){ clearTimeout(pollStartTimer); pollStartTimer = null; }
+}
+function armPolling(){
+  stopPolling();
+  if (Date.now() >= POLL_START){
+    startPolling();
+  } else {
+    pollStartTimer = setTimeout(startPolling, POLL_START - Date.now());
+  }
+}
+
+// Static pre-match render: no network at all, countdown ticks locally.
+function renderPregame(){
+  err.innerHTML = '';
+  comp.textContent = 'ליגת האומות';
+  homeName.textContent = 'אירלנד';
+  awayName.textContent = 'ישראל';
+  hs.textContent = '–'; as.textContent = '–';
+  statusLine.innerHTML = '<span class="badge">טרם החל</span>';
+  kickoffTs = KICKOFF;
+  kickoffLine.textContent = 'בעיטה: ' + fmtTime(KICKOFF);
+  countdown.style.display = 'block';
+  startCountdown();
+  eventsSec.style.display = 'none';
+  lineupSec.style.display = 'none';
+  setFooter('pre');
+}
 
 function render(m){
   err.innerHTML = '';
@@ -248,6 +300,7 @@ function render(m){
     startCountdown();
     eventsSec.style.display = 'none';
     lineupSec.style.display = 'none';
+    setFooter('live');
   } else {
     stopCountdown();
     countdown.style.display = 'none';
@@ -256,9 +309,12 @@ function render(m){
     as.textContent = (asc==null ? '–' : asc);
     if (finished){
       statusLine.innerHTML = '<span class="badge">סיום המשחק</span>';
+      stopPolling();
+      setFooter('done');
     } else {
       const min = m.live_minute ?? '';
       statusLine.innerHTML = '<span class="minute"><span class="dot"></span>חי' + (min!=='' ? ' • ' + min + '׳' : '') + '</span>';
+      setFooter('live');
     }
     renderEvents(m.incidents||[]);
     renderLineups(m.lineups||{}, m.home, m.away);
@@ -316,8 +372,8 @@ async function tick(){
     err.innerHTML = 'שגיאת חיבור לנתונים — מנסה שוב אוטומטית…';
   }
 }
-tick();
-setInterval(tick, 30000);
+renderPregame();
+armPolling();
 </script>
 </body>
 </html>
