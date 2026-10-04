@@ -46,7 +46,7 @@
   }
   /* countdown */
   .cd-title { text-align:center; font-size:18px; font-weight:700; color:#cdd8f2; margin-bottom:14px; }
-  .cd { display:flex; justify-content:center; gap:12px; direction:ltr; }
+  .cd { display:flex; justify-content:center; gap:12px; }
   .cd .cell {
     background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1);
     border-radius:16px; min-width:78px; padding:14px 6px; text-align:center;
@@ -103,7 +103,7 @@
         <img id="homeLogo" alt=""><div class="nm" id="homeName">אירלנד</div>
       </div>
       <div class="scorebox">
-        <div class="score" id="score"><span class="dash">–</span></div>
+        <div class="score" id="score"><span id="hs">–</span><span class="dash"> - </span><span id="as">–</span></div>
         <div id="statusLine"></div>
       </div>
       <div class="team">
@@ -113,9 +113,9 @@
     <div id="countdown" style="display:none; margin-top:18px;">
       <div class="cd-title">המשחק מתחיל בעוד</div>
       <div class="cd">
-        <div class="cell"><div class="num" id="cdS">00</div><div class="lbl">שניות</div></div>
-        <div class="cell"><div class="num" id="cdM">00</div><div class="lbl">דקות</div></div>
         <div class="cell"><div class="num" id="cdH">00</div><div class="lbl">שעות</div></div>
+        <div class="cell"><div class="num" id="cdM">00</div><div class="lbl">דקות</div></div>
+        <div class="cell"><div class="num" id="cdS">00</div><div class="lbl">שניות</div></div>
       </div>
       <div class="kickoff" id="kickoffLine"></div>
     </div>
@@ -148,6 +148,14 @@
 const API = 'https://sportscore.com/api/widget/match/?sport=football&slug=israel-vs-ireland';
 const WANT_DATE = '2026-10-04'; // guard: ignore stale fixtures between the same teams
 const TEAMS_HE = { 'Ireland':'אירלנד', 'Israel':'ישראל' };
+const COMP_HE = {
+  'uefa nations league':'ליגת האומות',
+  'fifa world cup':'מונדיאל', 'world cup':'מונדיאל',
+  'uefa euro':'יורו', 'european championship':'יורו',
+  'world cup qualification':'מוקדמות המונדיאל',
+  'nations league':'ליגת האומות'
+};
+const heComp = c => COMP_HE[norm(c)] || c || '';
 
 // Hebrew player names (Latin fallback when unknown — never guessed)
 const HE = {
@@ -221,7 +229,7 @@ function render(m){
     err.innerHTML = 'המשחק המבוקש (2026-10-04) טרם נטען — מוצג משחק אחר בין הקבוצות.';
     return;
   }
-  comp.textContent = m.competition || 'ליגת האומות';
+  comp.textContent = heComp(m.competition) || 'ליגת האומות';
   homeName.textContent = TEAMS_HE[m.home] || m.home || 'אירלנד';
   awayName.textContent = TEAMS_HE[m.away] || m.away || 'ישראל';
   if (m.home_logo) homeLogo.src = m.home_logo;
@@ -232,7 +240,7 @@ function render(m){
   const upcoming = ['upcoming','not started','notstarted','scheduled'].includes(st);
 
   if (upcoming){
-    score.innerHTML = '<span class="dash">–</span>';
+    hs.textContent = '–'; as.textContent = '–';
     statusLine.innerHTML = '<span class="badge">טרם החל</span>';
     kickoffTs = new Date(m.time).getTime();
     kickoffLine.textContent = 'בעיטה: ' + fmtTime(kickoffTs);
@@ -243,8 +251,9 @@ function render(m){
   } else {
     stopCountdown();
     countdown.style.display = 'none';
-    const hs = m.home_score ?? '–', as = m.away_score ?? '–';
-    score.textContent = hs + ' - ' + as;
+    const hsc = m.home_score, asc = m.away_score;
+    hs.textContent = (hsc==null ? '–' : hsc);
+    as.textContent = (asc==null ? '–' : asc);
     if (finished){
       statusLine.innerHTML = '<span class="badge">סיום המשחק</span>';
     } else {
@@ -269,7 +278,7 @@ function renderEvents(incs){
       desc = '<b>' + heName(i.player_out) + '</b> ← <b>' + heName(i.player_in) + '</b>';
     } else {
       desc = i.player ? '<b>' + heName(i.player) + '</b>' : '';
-      if (isG && i.home_score!=null) desc += ' <span class="sub">(' + i.home_score + '-' + i.away_score + ')</span>';
+      if (isG && i.home_score!=null) desc += ' <span class="sub"><bdi>(' + i.home_score + '-' + i.away_score + ')</bdi></span>';
     }
     const team = sideHe(i.side);
     return '<div class="ev' + (isG?' goal':'') + '"><div class="ico">' + ico + '</div>' +
