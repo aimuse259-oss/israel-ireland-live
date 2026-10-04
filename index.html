@@ -139,7 +139,7 @@
   </div>
 
   <footer>
-    <span class="upd">●</span> הנתונים מתעדכנים כל 30 שניות<br>
+    <span class="upd">●</span> הנתונים מתעדכנים כל 15 שניות<br>
     מקור הנתונים: SportScore
   </footer>
 </div>
@@ -230,7 +230,7 @@ function stopCountdown(){ if (cdTimer){ clearInterval(cdTimer); cdTimer = null; 
 function startPolling(){
   if (pollTimer) return;
   tick();
-  pollTimer = setInterval(tick, 30000);
+  pollTimer = setInterval(tick, 15000);
 }
 function stopPolling(){
   if (pollTimer){ clearInterval(pollTimer); pollTimer = null; }
