@@ -38,6 +38,13 @@
     padding:5px 16px; border-radius:999px;
   }
   .dot { width:9px; height:9px; border-radius:50%; background:#ff3c3c; animation:pulse 1.2s infinite; }
+  .pending {
+    display:inline-flex; align-items:center; gap:8px; margin-top:10px;
+    background:rgba(205,127,50,.14); border:1px solid rgba(205,127,50,.4);
+    color:#e0a060; font-weight:700; font-size:15px;
+    padding:5px 16px; border-radius:999px;
+  }
+  .pdot { width:9px; height:9px; border-radius:50%; background:#cd7f32; animation:pulse 1.2s infinite; }
   @keyframes pulse { 0%,100%{opacity:1; transform:scale(1);} 50%{opacity:.4; transform:scale(.75);} }
   .badge {
     display:inline-block; margin-top:10px; font-size:13px; font-weight:600;
@@ -252,11 +259,16 @@ function renderPregame(){
   homeName.textContent = 'אירלנד';
   awayName.textContent = 'ישראל';
   hs.textContent = '–'; as.textContent = '–';
-  statusLine.innerHTML = '<span class="badge">טרם החל</span>';
   kickoffTs = KICKOFF;
   kickoffLine.textContent = 'שריקת פתיחה: ' + fmtTime(KICKOFF);
-  countdown.style.display = 'block';
-  startCountdown();
+  if (Date.now() >= KICKOFF){
+    countdown.style.display = 'none';
+    statusLine.innerHTML = '<span class="pending"><span class="pdot"></span>עומד להתחיל</span>';
+  } else {
+    statusLine.innerHTML = '<span class="badge">טרם החל</span>';
+    countdown.style.display = 'block';
+    startCountdown();
+  }
   eventsSec.style.display = 'none';
   lineupSec.style.display = 'none';
 }
@@ -280,11 +292,17 @@ function render(m){
 
   if (upcoming){
     hs.textContent = '–'; as.textContent = '–';
-    statusLine.innerHTML = '<span class="badge">טרם החל</span>';
     kickoffTs = new Date(m.time).getTime();
     kickoffLine.textContent = 'שריקת פתיחה: ' + fmtTime(kickoffTs);
-    countdown.style.display = 'block';
-    startCountdown();
+    if (Date.now() >= kickoffTs){
+      stopCountdown();
+      countdown.style.display = 'none';
+      statusLine.innerHTML = '<span class="pending"><span class="pdot"></span>עומד להתחיל</span>';
+    } else {
+      statusLine.innerHTML = '<span class="badge">טרם החל</span>';
+      countdown.style.display = 'block';
+      startCountdown();
+    }
     eventsSec.style.display = 'none';
     lineupSec.style.display = 'none';
   } else {
