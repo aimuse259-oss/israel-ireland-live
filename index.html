@@ -64,6 +64,25 @@
   /* events */
   .sec-title { font-size:18px; font-weight:900; margin:26px 4px 12px; display:flex; align-items:center; gap:8px; }
   .sec-title::after { content:""; flex:1; height:1px; background:rgba(255,255,255,.1); }
+  /* tabs (live only, horizontal) */
+  #tabsBar { display:flex; gap:8px; margin:20px 2px 0; }
+  .tab {
+    flex:1; padding:10px 6px; border-radius:12px; border:1px solid rgba(255,255,255,.1);
+    background:rgba(255,255,255,.04); color:#9fb2d8; font-family:inherit;
+    font-size:15px; font-weight:700; cursor:pointer;
+  }
+  .tab.active { background:rgba(77,124,254,.18); border-color:rgba(77,124,254,.5); color:#fff; }
+  .tab.hidden { display:none; }
+  #panels.with-tabs .sec-title { display:none; }
+  #panels.with-tabs { margin-top:14px; }
+  /* stats */
+  .st-row { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); border-radius:14px; padding:12px 14px; margin-bottom:10px; }
+  .st-vals { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+  .st-vals b { font-size:17px; font-variant-numeric:tabular-nums; }
+  .st-lbl { color:#9fb2d8; font-size:13px; font-weight:600; }
+  .st-bar { display:flex; height:6px; border-radius:3px; overflow:hidden; background:rgba(255,255,255,.08); }
+  .st-fill-h { background:#4d7cfe; }
+  .st-fill-a { background:#8b98b8; }
   .ev {
     display:flex; gap:12px; align-items:flex-start;
     background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07);
@@ -129,6 +148,12 @@
     </div>
   </div>
 
+  <div id="tabsBar" style="display:none;">
+    <button class="tab" id="tabLineups" data-tab="lineups">הרכבים</button>
+    <button class="tab" id="tabEvents" data-tab="events">אירועים</button>
+    <button class="tab" id="tabStats" data-tab="stats">סטטיסטיקות</button>
+  </div>
+  <div id="panels">
   <div id="eventsSec" style="display:none;">
     <div class="sec-title">⚽ אירועים</div>
     <div id="events"></div>
@@ -144,6 +169,11 @@
       <div class="lucol"><h4 id="homeXiTitle"></h4><div id="homeXi"></div><h5>מחליפים</h5><div id="homeSubs"></div></div>
       <div class="lucol"><h4 id="awayXiTitle"></h4><div id="awayXi"></div><h5>מחליפים</h5><div id="awaySubs"></div></div>
     </div>
+  </div>
+
+  <div id="statsSec" style="display:none;">
+    <div id="statsList"></div>
+  </div>
   </div>
 
   <footer>
@@ -190,7 +220,14 @@ const HE = {
   // --- Well-known Israelis (opponents) ---
   'alon turgeman':"אלון תורג'מן",'doron leidner':'דורון ליידנר','liran rotman':'לירן רוטמן',
   'maxim plakushchenko':"מקסים פלקושצ'נקו",'oz bilu':'עוז בילו','liran hazan':'לירן חזן',
-  'noam cohen':'נועם כהן','shahar piven':'שחר פיבן'
+  'noam cohen':'נועם כהן','shahar piven':'שחר פיבן',
+  // --- Hapoel Ramat Gan ---
+  'i. burns':'עידן ברנס','getachew yebelu':"גטאצ'ו יבלו",'joão paulo marques gonçalves':"ג'וטה גונסלבס",
+  'david asanka':'דוד אסנקה','omer yizhak':'עומר יצחקי','christopher boniface':'כריסטופר בוניפייס',
+  'srđan mijailović':"סרג'ן מיאילוביץ'",'fard ibrahim':'פארד איברהים','amit raif':'עמית רייף',
+  'luan':'לואן קמפוס','luan campos':'לואן קמפוס',
+  'arik yanko':'אריק ינקו','marcio silva':'מרסיו סילבה','matan hozez':'מתן חוזז',
+  'marius novisi':'מריוס נוביסי'
 };
 const norm = s => (s||'').trim().toLowerCase().replace(/\s+/g,' ');
 const heName = n => HE[norm(n)] || (n||'').trim();
@@ -329,6 +366,8 @@ function render(m){
       startCountdown();
     }
     eventsSec.style.display = 'none';
+    tabsBar.style.display = 'none';
+    panels.classList.remove('with-tabs');
     renderLineups(m.lineups||{}, m.home, m.away);
   } else {
     stopCountdown();
@@ -345,6 +384,8 @@ function render(m){
       }
     renderEvents(m.incidents||[]);
     renderLineups(m.lineups||{}, m.home, m.away);
+    renderStats(m.stats||[], m.home, m.away);
+    updateTabs(m);
   }
 }
 
@@ -387,6 +428,60 @@ function renderLineups(lu, home, away){
   awaySubs.innerHTML = (lu.away_subs||[]).map(pl).join('');
 }
 
+const STATS_HE = {
+  'ball possession':'החזקת כדור',
+  'shots on target':'בעיטות למסגרת','shots off target':'בעיטות מחוץ למסגרת',
+  'shots':'בעיטות','shots inside box':'בעיטות מתוך הרחבה','shots outside box':'בעיטות מחוץ לרחבה',
+  'attacks':'התקפות','dangerous attacks':'התקפות מסוכנות',
+  'corners':'קרנות','fouls':'עבירות','offsides':'נבדלים',
+  'yellow cards':'כרטיסים צהובים','red cards':'כרטיסים אדומים',
+  'saves':'הצלות','goalkeeper saves':'הצלות שוער',
+  'passes':'מסירות','pass accuracy':'דיוק מסירות','accurate passes':'מסירות מדויקות',
+  'throw ins':'הוצאות חוץ','goal kicks':'בעיטות חמש','free kicks':'בעיטות חופשיות',
+  'penalties':'פנדלים'
+};
+function renderStats(stats, home, away){
+  if (!stats || !stats.length) return;
+  statsList.innerHTML = stats.map(s=>{
+    const lbl = STATS_HE[(s.label||'').toLowerCase()] || s.label || '';
+    const suf = s.suffix || '';
+    const hv = (s.home ?? '–'), av = (s.away ?? '–');
+    const hp = Math.max(0, Math.min(100, s.home_pct ?? 50));
+    const ap = Math.max(0, Math.min(100, s.away_pct ?? 50));
+    return '<div class="st-row"><div class="st-vals"><b>' + hv + suf + '</b>'
+      + '<span class="st-lbl">' + lbl + '</span>'
+      + '<b>' + av + suf + '</b></div>'
+      + '<div class="st-bar"><div class="st-fill-h" style="width:' + hp + '%"></div>'
+      + '<div class="st-fill-a" style="width:' + ap + '%"></div></div></div>';
+  }).join('');
+}
+
+// Tabs (live only): a tab is shown only when its panel has content
+let activeTab = 'events';
+function applyTabs(){
+  tabLineups.classList.toggle('active', activeTab==='lineups');
+  tabEvents.classList.toggle('active', activeTab==='events');
+  tabStats.classList.toggle('active', activeTab==='stats');
+  eventsSec.style.display = activeTab==='events' ? 'block' : 'none';
+  lineupSec.style.display = activeTab==='lineups' ? 'block' : 'none';
+  statsSec.style.display = activeTab==='stats' ? 'block' : 'none';
+}
+function updateTabs(m){
+  const hasEv = (m.incidents||[]).length > 0;
+  const lu = m.lineups||{};
+  const hasLu = (lu.home_xi&&lu.home_xi.length) || (lu.away_xi&&lu.away_xi.length);
+  const hasSt = (m.stats||[]).length > 0;
+  tabsBar.style.display = 'flex';
+  panels.classList.add('with-tabs');
+  tabLineups.classList.toggle('hidden', !hasLu);
+  tabEvents.classList.toggle('hidden', !hasEv);
+  tabStats.classList.toggle('hidden', !hasSt);
+  const avail = ['events','lineups','stats'].filter(t =>
+    (t==='events'&&hasEv)||(t==='lineups'&&hasLu)||(t==='stats'&&hasSt));
+  if (!avail.includes(activeTab)) activeTab = avail[0] || 'events';
+  applyTabs();
+}
+
 async function tick(){
   try {
     const r = await fetch(API, {cache:'no-store'});
@@ -398,6 +493,9 @@ async function tick(){
     err.innerHTML = 'שגיאת חיבור לנתונים — מנסה שוב אוטומטית…';
   }
 }
+document.querySelectorAll('#tabsBar .tab').forEach(b=>{
+  b.addEventListener('click', ()=>{ activeTab = b.dataset.tab; applyTabs(); });
+});
 renderPregame();
 armPolling();
 </script>
