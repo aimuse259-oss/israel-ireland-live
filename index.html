@@ -273,7 +273,7 @@ function startCountdown(){
   const pad = n => String(n).padStart(2,'0');
   const upd = () => {
     let diff = Math.max(0, kickoffTs - Date.now());
-    const d = Math.floor(diff/8.64e6), h = Math.floor(diff%8.64e6/3.6e6), m = Math.floor(diff%3.6e6/6e4), s = Math.floor(diff%6e4/1e3);
+    const d = Math.floor(diff/8.64e7), h = Math.floor(diff%8.64e7/3.6e6), m = Math.floor(diff%3.6e6/6e4), s = Math.floor(diff%6e4/1e3);
     cdD.textContent = d; cdH.textContent = pad(h); cdM.textContent = pad(m); cdS.textContent = pad(s);
     cdDCell.style.display = d > 0 ? '' : 'none';
     if (diff <= 0) startPolling(); // kickoff reached -> make sure polling runs
