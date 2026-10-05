@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ישראל נגד אירלנד • חי</title>
+<title>בית״ר ירושלים נגד הפועל רמת גן • חי</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
@@ -102,19 +102,19 @@
 </head>
 <body>
 <div class="wrap">
-  <div class="comp" id="comp">ליגת האומות • מחזור 4</div>
+  <div class="comp" id="comp">ליגת העל • מחזור 6</div>
   <div id="err"></div>
   <div class="card">
     <div class="teams">
       <div class="team">
-        <img id="homeLogo" src="https://img.thesports.com/football/team/c9949ae5d534fe930eae666413d32239.png" alt="אירלנד"><div class="nm" id="homeName">אירלנד</div>
+        <img id="homeLogo" src="https://img.thesports.com/football/team/5c82ccd51af2ccbd6b71680fa90ad408.jpg" alt="הפועל רמת גן"><div class="nm" id="homeName">הפועל רמת גן</div>
       </div>
       <div class="scorebox">
         <div class="score" id="score"><span id="hs">–</span><span class="dash"> - </span><span id="as">–</span></div>
         <div id="statusLine"></div>
       </div>
       <div class="team">
-        <img id="awayLogo" src="https://img.thesports.com/football/team/b0dc1effcd883299ca8ec96dd720d30c.png" alt="ישראל"><div class="nm" id="awayName">ישראל</div>
+        <img id="awayLogo" src="https://img.thesports.com/football/team/93f67693ee0e5e8eb5176ec83749f84d.png" alt="בית״ר ירושלים"><div class="nm" id="awayName">בית״ר ירושלים</div>
       </div>
     </div>
     <div id="countdown" style="display:none; margin-top:18px;">
@@ -152,19 +152,20 @@
 </div>
 
 <script>
-const API = 'https://sportscore.com/api/widget/match/?sport=football&slug=israel-vs-ireland';
-const WANT_DATE = '2026-10-04'; // guard: ignore stale fixtures between the same teams
+const API = 'https://sportscore.com/api/widget/match/?sport=football&slug=hapoel-ramat-gan-vs-beitar-jerusalem';
+const WANT_DATE = '2026-10-11'; // guard: ignore stale fixtures between the same teams
 // Polling: pre-match lineups watch (every 60s) from 90 min before kickoff;
 // full live polling (every 5s) from 90 seconds before kickoff until the match actually ends.
 // Before the lineups watch the page shows a local countdown with zero network requests.
 // Everything runs in the visitor's browser — no server-side polling.
-const KICKOFF = new Date('2026-10-04T18:45:00Z').getTime();
+const KICKOFF = new Date('2026-10-11T17:15:00Z').getTime();
 const POLL_START = KICKOFF - 90*1000;
 const PRE_POLL_START = KICKOFF - 90*60*1000;
 const PRE_POLL_MS = 60000, POLL_MS = 5000;
 let pollTimer = null, pollStartTimer = null, pollMode = null;
-const TEAMS_HE = { 'Ireland':'אירלנד', 'Israel':'ישראל' };
+const TEAMS_HE = { 'Hapoel Ramat Gan':'הפועל רמת גן', 'Beitar Jerusalem':'בית״ר ירושלים' };
 const COMP_HE = {
+  'israel ligat haal':'ליגת העל',
   'uefa nations league':'ליגת האומות',
   'fifa world cup':'מונדיאל', 'world cup':'מונדיאל',
   'uefa euro':'יורו', 'european championship':'יורו',
@@ -175,27 +176,20 @@ const heComp = c => COMP_HE[norm(c)] || c || '';
 
 // Hebrew player names (Latin fallback when unknown — never guessed)
 const HE = {
-  // --- Israel ---
-  'daniel peretz':'דניאל פרץ','omri glazer':'עומרי גלזר','yoav gerafi':'יואב גראפי',
-  'eli dasa':'אלי דסה','raz shlomo':'רז שלמה','ofri arad':'עופרי ארד','stav lemkin':'סתיו למקין',
-  'roy revivo':'רוי רביבו','idan nachmias':'עידן נחמיאס','or israelov':'אור ישראלוב',
-  'neta lavi':'נטע לביא','dor peretz':'דור פרץ','mohammad abu fani':'מוחמד אבו פאני',
-  'oscar gloukh':'אוסקר גלוך','manor solomon':'מנור סולומון','liel abada':'ליאל עבדה',
-  'tai baribo':'תאי בריבו','anan khalaili':'ענאן חלאילי','dean david':'דין דוד',
-  'yonas malede':'יונס מלדה','sagiv yehezkel':'שגיב יחזקאל','gavriel kanichowsky':'גבריאל קניקובסקי',
-  'ramzi safuri':'רמזי ספורי','dennis adeniran':'דניס אדנירן',
-  // --- Ireland ---
-  'caoimhin kelleher':'קאווהין קלהר','gavin bazunu':'גאבין באזונו','mark travers':'מארק טראברס',
-  'matt doherty':'מאט דוהרטי','nathan collins':'ניית׳ן קולינס','dara oshea':"דארה אושיי",
-  'liam scales':'ליאם סקיילס','robbie brady':'רובי בריידי','seamus coleman':'שיימוס קולמן',
-  'josh cullen':"ג'וש קאלן",'jason knight':"ג'ייסון נייט",'finn azaz':'פין עזאז',
-  'jayson molumby':"ג'ייסון מולומבי",'will smallbone':'וויל סמולבון','andy moran':'אנדי מורן',
-  'evan ferguson':'אוון פרגוסון','troy parrott':'טרוי פארוט','adam idah':'אדם אידה',
-  'chiedozie ogbene':"צ'ידוזי אוגבנה",'sammie szmodics':'סמי סמודיקס','mikey johnston':'מייקי ג׳ונסטון',
-  'jake obrien':"ג'ייק אובריאן",'jimmy dunne':"ג'ימי דאן",
-  // --- Beitar / known Israelis (may appear) ---
+  // --- Beitar Jerusalem ---
   'yarden shua':'ירדן שועה','omer atzili':'עומר אצילי','shon weissman':'שון וייסמן',
-  'tomer yosefi':'תומר יוספי','dor hugy':'דור חוגי','timothy muzie':'טימותי מוזי'
+  'tomer yosefi':'תומר יוספי','grigory morozov':'גריגורי מורוזוב','ziv ben shimol':'זיו בן שימול',
+  'maor levi':'מאור לוי','dor hugy':'דור חוגי','boris enow takang':'בוריס אינו',
+  'luka gadrani':'לוקה גאדראני','antonio sefer':'אנטוניו ספר','arial mendy':'אריאל מנדי',
+  'brayan carabalí':'בריאן קארבאלי','shai elias':'שי אליאס','adi menachem yona':'עדי יונה',
+  'timothy muzie':'טימותי מוזי','roey elimelech':'רועי אלימלך','ori dahan':'אורי דהן',
+  'idan baranes':'עידן ברנס','tamir glazer':'תמיר גלזר','itay baruch':'איתי ברוך',
+  'ilay haddad':'עילאי חדד','omri shamir':'עומרי שמיר','nadav markovitch':"נדב מרקוביץ'",
+  'liel deri':'ליאל דרי','gil cohen':'גיל כהן','amit cohen':'עמית כהן','amit tzur':'עמית צור',
+  // --- Well-known Israelis (opponents) ---
+  'alon turgeman':"אלון תורג'מן",'doron leidner':'דורון ליידנר','liran rotman':'לירן רוטמן',
+  'maxim plakushchenko':"מקסים פלקושצ'נקו",'oz bilu':'עוז בילו','liran hazan':'לירן חזן',
+  'noam cohen':'נועם כהן','shahar piven':'שחר פיבן'
 };
 const norm = s => (s||'').trim().toLowerCase().replace(/\s+/g,' ');
 const heName = n => HE[norm(n)] || (n||'').trim();
@@ -228,7 +222,7 @@ function fmtMinute(min){
   if (t === 'ET') return 'הארכה';
   return min + '׳';
 }
-const sideHe = s => s==='home' ? TEAMS_HE['Ireland'] : s==='away' ? TEAMS_HE['Israel'] : '';
+const sideHe = s => s==='home' ? TEAMS_HE['Hapoel Ramat Gan'] : s==='away' ? TEAMS_HE['Beitar Jerusalem'] : '';
 
 let kickoffTs = null, cdTimer = null;
 
@@ -284,9 +278,9 @@ function armPolling(){
 // Static pre-match render: no network at all, countdown ticks locally.
 function renderPregame(){
   err.innerHTML = '';
-  comp.textContent = 'ליגת האומות • מחזור 4';
-  homeName.textContent = 'אירלנד';
-  awayName.textContent = 'ישראל';
+  comp.textContent = 'ליגת העל • מחזור 6';
+  homeName.textContent = 'הפועל רמת גן';
+  awayName.textContent = 'בית״ר ירושלים';
   hs.textContent = '–'; as.textContent = '–';
   kickoffTs = KICKOFF;
   kickoffLine.textContent = 'שריקת פתיחה: ' + fmtTime(KICKOFF);
@@ -306,12 +300,12 @@ function render(m){
   err.innerHTML = '';
   // date guard
   if (WANT_DATE && !(m.time||'').startsWith(WANT_DATE)){
-    err.innerHTML = 'המשחק המבוקש (2026-10-04) טרם נטען — מוצג משחק אחר בין הקבוצות.';
+    err.innerHTML = 'המשחק המבוקש (2026-10-11) טרם נטען — מוצג משחק אחר בין הקבוצות.';
     return;
   }
-  comp.textContent = (heComp(m.competition) || 'ליגת האומות') + ' • מחזור 4';
-  homeName.textContent = TEAMS_HE[m.home] || m.home || 'אירלנד';
-  awayName.textContent = TEAMS_HE[m.away] || m.away || 'ישראל';
+  comp.textContent = (heComp(m.competition) || 'ליגת העל') + ' • מחזור 6';
+  homeName.textContent = TEAMS_HE[m.home] || m.home || 'הפועל רמת גן';
+  awayName.textContent = TEAMS_HE[m.away] || m.away || 'בית״ר ירושלים';
   if (m.home_logo) homeLogo.src = m.home_logo;
   if (m.away_logo) awayLogo.src = m.away_logo;
 
