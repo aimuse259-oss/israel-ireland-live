@@ -120,6 +120,7 @@
     <div id="countdown" style="display:none; margin-top:18px;">
       <div class="cd-title">המשחק מתחיל בעוד</div>
       <div class="cd">
+        <div class="cell" id="cdDCell" style="display:none"><div class="num" id="cdD">0</div><div class="lbl">ימים</div></div>
         <div class="cell"><div class="num" id="cdH">00</div><div class="lbl">שעות</div></div>
         <div class="cell"><div class="num" id="cdM">00</div><div class="lbl">דקות</div></div>
         <div class="cell"><div class="num" id="cdS">00</div><div class="lbl">שניות</div></div>
@@ -235,8 +236,9 @@ function startCountdown(){
   const pad = n => String(n).padStart(2,'0');
   const upd = () => {
     let diff = Math.max(0, kickoffTs - Date.now());
-    const h = Math.floor(diff/3.6e6), m = Math.floor(diff%3.6e6/6e4), s = Math.floor(diff%6e4/1e3);
-    cdH.textContent = pad(h); cdM.textContent = pad(m); cdS.textContent = pad(s);
+    const d = Math.floor(diff/8.64e6), h = Math.floor(diff%8.64e6/3.6e6), m = Math.floor(diff%3.6e6/6e4), s = Math.floor(diff%6e4/1e3);
+    cdD.textContent = d; cdH.textContent = pad(h); cdM.textContent = pad(m); cdS.textContent = pad(s);
+    cdDCell.style.display = d > 0 ? '' : 'none';
     if (diff <= 0) startPolling(); // kickoff reached -> make sure polling runs
   };
   cdTimer = setInterval(upd, 1000); upd();
